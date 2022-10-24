@@ -81,6 +81,7 @@
 
 #define	vlog(x...)					if ( gVerbose ) { fprintf(stdout,x); }
 #define	elog(x...)					fprintf(stderr, x)
+#define	log(x...)					fprintf(stdout, x)
 
 //—————————————————————————————————————————————————————————————————————————————
 //	Globals
@@ -110,55 +111,55 @@ void PrintUsage ( void );
 void
 PrintUsage ( void )
 {
-  elog ( "\n");
-  elog ( "Usage: %s [OPTIONS] [vendor_id,product_id [vendor_id,product_id] [locationID [location ID]]...\n", gProgramName );
-  elog ( "\n");
+  log ( "\n");
+  log ( "Usage: %s [OPTIONS] [vendor_id,product_id [vendor_id,product_id] [locationID [location ID]]...\n", gProgramName );
+  log ( "\n");
 
-  elog ( "OPTIONS\n");
-  elog ( "\tThe available options are as follows.  If no option is specified the values after the options are assumed to be a\n");
-  elog ( "\tsequence of vendorID,productID pairs (in hex).  If the -l option is specified, the values after the options are assumed\n");
-  elog ( "\tto be locationID's (in hex).  If no action option is specitied, a reenumerate command will be sent to the device(s):\n");
-  elog ( "\n");
+  log ( "OPTIONS\n");
+  log ( "\tThe available options are as follows.  If no option is specified the values after the options are assumed to be a\n");
+  log ( "\tsequence of vendorID,productID pairs (in hex).  If the -l option is specified, the values after the options are assumed\n");
+  log ( "\tto be locationID's (in hex).  If no action option is specitied, a reenumerate command will be sent to the device(s):\n");
+  log ( "\n");
 
 
-  elog ( "\t--locationID, -l\n");
-  elog ( "\t\t The values after the options are locationIDs, instead of vendorID,productID.\n");
+  log ( "\t--locationID, -l\n");
+  log ( "\t\t The values after the options are locationIDs, instead of vendorID,productID.\n");
 
-  elog ( "\t--configuration, -c\n");
-  elog ( "\t\t Set the USB configuration to the value specified.\n");
+  log ( "\t--configuration, -c\n");
+  log ( "\t\t Set the USB configuration to the value specified.\n");
 
-  elog ( "\t--resume, -r\n");
-  elog ( "\t\t Send a USB Resume to the device.\n");
+  log ( "\t--resume, -r\n");
+  log ( "\t\t Send a USB Resume to the device.\n");
 
-  elog ( "\t--suspend, -s\n");
-  elog ( "\t\t Send a USB Suspend to the device.\n");
+  log ( "\t--suspend, -s\n");
+  log ( "\t\t Send a USB Suspend to the device.\n");
 
-  elog ( "\t--reset, -R\n");
-  elog ( "\t\t Send a USB ResetDevice to the device.\n");
+  log ( "\t--reset, -R\n");
+  log ( "\t\t Send a USB ResetDevice to the device.\n");
 
-  elog ( "\t--verbose, -v\n");
-  elog ( "\t\t Verbose mode.\n");
+  log ( "\t--verbose, -v\n");
+  log ( "\t\t Verbose mode.\n");
 
-  elog ( "\t--version, -V\n");
-  elog ( "\t\t Print version.\n");
+  log ( "\t--version, -V\n");
+  log ( "\t\t Print version.\n");
 
-  elog ( "\t--help, -h, -?\n");
-  elog ( "\t\t Show this help.\n");
+  log ( "\t--help, -h, -?\n");
+  log ( "\t\t Show this help.\n");
 
-  elog ( "\n");
+  log ( "\n");
 
-  elog ( "EXAMPLES\n");
-  elog ( "\tSet the configuration of the device at vid: 0x05ac, pid: 0x1126 to 1:\n\n");
-  elog ( "\t$ reenumerate -v -c 1 0x05ac,0x1126\n\n");
-  elog ( "\tReenumerate the devices at locationIDs 0xfa144300 and 0xfd141310\n\n");
-  elog ( "\t$ reenumerate -v -l 0xfa144300 0xfd141310\n");
-  elog ( "\n");
+  log ( "EXAMPLES\n");
+  log ( "\tSet the configuration of the device at vid: 0x05ac, pid: 0x1126 to 1:\n\n");
+  log ( "\t$ reenumerate -v -c 1 0x05ac,0x1126\n\n");
+  log ( "\tReenumerate the devices at locationIDs 0xfa144300 and 0xfd141310\n\n");
+  log ( "\t$ reenumerate -v -l 0xfa144300 0xfd141310\n");
+  log ( "\n");
 
-  elog ( "EXAMPLES\n");
-  elog ( "\tSet the configuration of the device at vid: 0x05ac, pid: 0x1126 to 1:\n\n");
-  elog ( "\t$ reenumerate -v -c 1 0x05ac,0x1126\n\n");
-  elog ( "\tReenumerate the devices at locationIDs 0xfa144300 and 0xfd141310\n\n");
-  elog ( "\t$ reenumerate -v -l 0xfa144300 0xfd141310\n");
+  log ( "EXAMPLES\n");
+  log ( "\tSet the configuration of the device at vid: 0x05ac, pid: 0x1126 to 1:\n\n");
+  log ( "\t$ reenumerate -v -c 1 0x05ac,0x1126\n\n");
+  log ( "\tReenumerate the devices at locationIDs 0xfa144300 and 0xfd141310\n\n");
+  log ( "\t$ reenumerate -v -l 0xfa144300 0xfd141310\n");
   exit ( 0 );
 
 }
