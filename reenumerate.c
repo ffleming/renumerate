@@ -35,6 +35,9 @@
 #include <IOKit/IOCFPlugIn.h>
 #include <IOKit/usb/IOUSBLib.h>
 
+#include <unistd.h>
+#include <sys/types.h>
+
 #define IOUSBFAMILY_VERSION                 630.4.5
 #define APPLEUSBHUB_VERSION                 623.4.4
 #define APPLEUSBMERGENUB_VERSION            621.4.6
@@ -348,6 +351,12 @@ int main(int argc, const char *argv[] )
   io_object_t				aDevice;
 
   gProgramName = argv[0];
+
+  uid_t euid = geteuid();
+  if(euid != 0) {
+      elog("Must run as root\n");
+      return 1;
+  }
 
   // Get program arguments.
   ParseArguments ( argc, argv );
