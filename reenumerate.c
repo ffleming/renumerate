@@ -21,6 +21,10 @@
  * @APPLE_LICENSE_HEADER_END@
  */
 
+/*
+ * https://opensource.apple.com/source/IOUSBFamily/IOUSBFamily-630.4.5/USBProberV2/reenumerate/renumerate.c
+ */
+
 #include <CoreFoundation/CoreFoundation.h>
 
 #include <getopt.h>
