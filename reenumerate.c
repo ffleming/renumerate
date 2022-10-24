@@ -81,7 +81,6 @@
 #define QUOTEDSTRING(s) STRING(s)
 #define STRING(s) #s
 
-
 #define	vlog(x...)					if ( gVerbose ) { fprintf(stdout,x); }
 #define	elog(x...)					fprintf(stderr, x)
 #define	log(x...)					fprintf(stdout, x)
@@ -111,9 +110,7 @@ void PrintUsage ( void );
 //	PrintUsage
 //———————————————————————————————————————————————————————————————————————————
 
-void
-PrintUsage ( void )
-{
+void PrintUsage ( void ) {
   log ( "\n");
   log ( "Usage: %s [OPTIONS] [vendor_id,product_id [vendor_id,product_id] [locationID [location ID]]...\n", gProgramName );
   log ( "\n");
@@ -123,7 +120,6 @@ PrintUsage ( void )
   log ( "\tsequence of vendorID,productID pairs (in hex).  If the -l option is specified, the values after the options are assumed\n");
   log ( "\tto be locationID's (in hex).  If no action option is specitied, a reenumerate command will be sent to the device(s):\n");
   log ( "\n");
-
 
   log ( "\t--locationID, -l\n");
   log ( "\t\t The values after the options are locationIDs, instead of vendorID,productID.\n");
@@ -172,33 +168,29 @@ PrintUsage ( void )
 //	ParseArguments
 //———————————————————————————————————————————————————————————————————————————
 
-static void
-ParseArguments ( int argc, const char * argv[] )
-{
-  int 					c;
-  struct option 			long_options[] =
+static void ParseArguments ( int argc, const char * argv[] ) {
+  int c;
+  struct option long_options[] =
       {
-          { "reset",			no_argument,		0, 'R' },
-          { "suspend",		no_argument,		0, 's' },
-          { "resume",			no_argument,		0, 'r' },
-          { "configuration",  required_argument,	0, 'c' },
+          { "reset"         , no_argument       , 0 , 'R' } ,
+          { "suspend"       , no_argument       , 0 , 's' } ,
+          { "resume"        , no_argument       , 0 , 'r' } ,
+          { "configuration" , required_argument , 0 , 'c' } ,
 
-          { "locationID",		no_argument,        0, 'l' },
+          { "locationID"    , no_argument       , 0 , 'l' } ,
 
-          { "verbose",		no_argument,		0, 'v' },
-          { "version",		no_argument,		0, 'V' },
-          { "help",			no_argument,		0, 'h' },
-          { 0, 0, 0, 0 }
+          { "verbose"       , no_argument       , 0 , 'v' } ,
+          { "version"       , no_argument       , 0 , 'V' } ,
+          { "help"          , no_argument       , 0 , 'h' } ,
+          { 0               , 0                 , 0 , 0 }
       };
 
-  if ( argc == 1 )
-  {
+  if ( argc == 1 ) {
     PrintUsage();
     return;
   }
 
-  while ( ( c = getopt_long ( argc, ( char * const * ) argv , "Rsrc:lvVh?", long_options, NULL  ) ) != -1 )
-  {
+  while ( ( c = getopt_long ( argc, ( char * const * ) argv , "Rsrc:lvVh?", long_options, NULL  ) ) != -1 ) {
     switch ( c )
     {
       case 'R':
@@ -218,7 +210,8 @@ ParseArguments ( int argc, const char * argv[] )
 
       case 'c':
         gDoSetConfiguration = TRUE;
-        gConfiguration = (uint32_t)strtoul(optarg, NULL, 0);	// is this safe?
+        // is this safe?
+        gConfiguration = (uint32_t)strtoul(optarg, NULL, 0);
         break;
 
       case 'l':
@@ -248,29 +241,26 @@ ParseArguments ( int argc, const char * argv[] )
   }
 }
 
-void ProcessDevice(io_service_t aDevice)
-{
-  IOCFPlugInInterface			**plugInInterface;
-  IOUSBDeviceInterface187		**deviceInterface;
-  SInt32						score;
-  HRESULT						res;
-  CFNumberRef					numberObj;
-  io_name_t					name;
-  uint32_t					locationID = 0;
-  IOReturn					kr;
+void ProcessDevice(io_service_t aDevice) {
+  IOCFPlugInInterface      **plugInInterface;
+  IOUSBDeviceInterface187  **deviceInterface;
+  SInt32                   score;
+  HRESULT                  res;
+  CFNumberRef              numberObj;
+  io_name_t                name;
+  uint32_t                 locationID = 0;
+  IOReturn                 kr;
 
   kr = IORegistryEntryGetName(aDevice, name);
-  if ( kr != kIOReturnSuccess)
+  if ( kr != kIOReturnSuccess) {
     return;
+  }
 
   numberObj = IORegistryEntryCreateCFProperty(aDevice, CFSTR("locationID"), kCFAllocatorDefault, 0);
-  if ( numberObj )
-  {
+  if ( numberObj ) {
     CFNumberGetValue(numberObj, kCFNumberSInt32Type, &locationID);
     CFRelease(numberObj);
-
     vlog("Found \"%s\" @ 0x%8.8x\n", name, locationID);
-
   }
 
   kr = IOCreatePlugInInterfaceForService(aDevice, kIOUSBDeviceUserClientTypeID, kIOCFPlugInInterfaceID, &plugInInterface, &score);
@@ -292,34 +282,27 @@ void ProcessDevice(io_service_t aDevice)
   }
 
   kr = (*deviceInterface)->USBDeviceOpen(deviceInterface);
-  if(kr == kIOReturnSuccess)
-  {
-    if (gDoSetConfiguration)
-    {
+  if(kr == kIOReturnSuccess) {
+    if (gDoSetConfiguration) {
       vlog("Calling SetConfiguration(%d)\n", gConfiguration);
       kr = (*deviceInterface)->SetConfiguration(deviceInterface, gConfiguration);
       vlog("SetConfiguration(%d) returns 0x%8.8x\n", (uint32_t)gConfiguration, kr);
     }
-    else if (gDoSuspend)
-    {
+    else if (gDoSuspend) {
       vlog("Calling USBDeviceSuspend(TRUE)\n");
       kr = (*deviceInterface)->USBDeviceSuspend(deviceInterface, TRUE);
       vlog("USBDeviceSuspend(TRUE) returns 0x%8.8x\n", kr);
     }
-    else if (gDoResume)
-    {
+    else if (gDoResume) {
       vlog("Calling USBDeviceSuspend(FALSE)\n");
       kr = (*deviceInterface)->USBDeviceSuspend(deviceInterface, FALSE);
       vlog("USBDeviceSuspend(FALSE) returns 0x%8.8x\n", kr);
     }
-    else if(gDoReset)
-    {
+    else if(gDoReset) {
       vlog("Calling ResetDevice\n");
       kr = (*deviceInterface)->ResetDevice(deviceInterface);
       vlog("ResetDevice returns 0x%8.8x\n", kr);
-    }
-    else
-    {
+    } else {
       vlog("Calling USBDeviceReEnumerate\n");
       kr = (*deviceInterface)->USBDeviceReEnumerate(deviceInterface, 0);
       vlog("USBDeviceReEnumerate returns 0x%8.8x\n", kr);
@@ -332,23 +315,23 @@ void ProcessDevice(io_service_t aDevice)
 }
 
 //================================================================================================
-//	main
+// main
 //================================================================================================
 int main(int argc, const char *argv[] )
 {
-  CFMutableDictionaryRef 	matchingDict            = NULL;
-  CFMutableDictionaryRef  propertyMatchingDict    = NULL;
-  CFNumberRef				numberRef;
-  CFNumberRef                 locationIDRef           = NULL;
-  kern_return_t			kr;
-  uint32_t					usbVendor;
-  uint32_t					usbProduct;
-  uint32_t					deviceLocationID;
-  const char*				param;
-  char*					param2;
-  int						paramIndex = 1;
-  io_iterator_t			foundDevices;
-  io_object_t				aDevice;
+  CFMutableDictionaryRef  matchingDict          = NULL;
+  CFMutableDictionaryRef  propertyMatchingDict  = NULL;
+  CFNumberRef             locationIDRef         = NULL;
+  CFNumberRef             numberRef;
+  kern_return_t           kr;
+  uint32_t                usbVendor;
+  uint32_t                usbProduct;
+  uint32_t                deviceLocationID;
+  const char*             param;
+  char*                   param2;
+  int                     paramIndex = 1;
+  io_iterator_t           foundDevices;
+  io_object_t             aDevice;
 
   gProgramName = argv[0];
 
@@ -363,8 +346,7 @@ int main(int argc, const char *argv[] )
 
   paramIndex = optind;
 
-  for( ; paramIndex < argc; paramIndex++ )
-  {
+  for( ; paramIndex < argc; paramIndex++ ) {
     param = argv[paramIndex];
 
     matchingDict = IOServiceMatching(kIOUSBDeviceClassName);	// Interested in instances of class
@@ -374,8 +356,7 @@ int main(int argc, const char *argv[] )
       return -1;
     }
 
-    if (!gDoLocationID)
-    {
+    if (!gDoLocationID) {
       usbVendor = (uint32_t) strtoul(param, &param2, 0);
       usbProduct = *param2++ ? (uint32_t) strtoul(param2, 0, 0) : 0;
 
@@ -388,9 +369,7 @@ int main(int argc, const char *argv[] )
       numberRef = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &usbProduct);
       CFDictionarySetValue(matchingDict, CFSTR(kUSBProductID),  numberRef);
       CFRelease(numberRef);
-    }
-    else
-    {
+    } else {
       deviceLocationID = (uint32_t) strtoul(param, &param2, 0);
 
       vlog("Looking for locationID: 0x%x\n", (uint32_t)deviceLocationID);
@@ -412,29 +391,26 @@ int main(int argc, const char *argv[] )
       // IOServiceGetMatchingServices retains the returned iterator, so release the iterator when we're done with it.
       // IOServiceGetMatchingServices also consumes a reference on the matching dictionary so we don't need to release
       // the dictionary explicitly.
-
     }
 
     kr = IOServiceGetMatchingServices(kIOMainPortDefault,matchingDict, &foundDevices);	//consumes matchingDict reference
     matchingDict = NULL;
-    if(kr)
-    {
+    if(kr) {
       elog("Error 0x%x trying to find matching services\n", kr);
       continue;
     }
 
 
-    while ( (aDevice = IOIteratorNext(foundDevices)))
-    {
-
+    while ( (aDevice = IOIteratorNext(foundDevices))) {
       ProcessDevice(aDevice);
     }
 
   }
   ErrorExit:
 
-  if (matchingDict)
+  if (matchingDict) {
     CFRelease(matchingDict);
+  }
 
   return 0;
 }
